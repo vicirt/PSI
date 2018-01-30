@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">PSI</string>
     <string name="introduction">Pollutant Standards Index (PSI) in Singapore</string>
+    <string name="source">Source: data.gov.sg</string>
+    <string name="o3_sub_index">O3 sub index:</string>
+    <string name="pm10_twenty_four_hourly">PM10 twenty four hourly:</string>
+    <string name="pm10_sub_index">PM10 sub index:</string>
+    <string name="co_sub_index">CO sub index:</string>
+    <string name="pm25_twenty_four_hourly">PM25 twenty four hourly:</string>
+    <string name="so2_sub_index">SO2 sub index:</string>
+    <string name="co_eight_hour_max">CO eight hour max:</string>
+    <string name="no2_one_hour_max">NO2 one hour max:</string>
+    <string name="so2_twenty_four_hourly">SO2 twenty four hourly:</string>
+    <string name="pm25_sub_index">PM25 sub index:</string>
+    <string name="psi_twenty_four_hourly">PSI twenty four hourly:</string>
+    <string name="o3_eight_hour_max">O3 eight hour max:</string>
 </resources>

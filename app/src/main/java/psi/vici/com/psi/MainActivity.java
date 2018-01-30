@@ -15,19 +15,45 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
+import psi.vici.com.psi.adapters.InfoWindowCustomAdapter;
+import psi.vici.com.psi.models.PsiResponse;
+import psi.vici.com.psi.models.RegionMetadata;
+import psi.vici.com.psi.services.ApiService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private PsiResponse data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(MainActivity.this);
+        //call api service
+        ApiService service = ApiService.retrofit.create(ApiService.class);
+        Call<PsiResponse> psiCall = service.getPSIData();
+        psiCall.enqueue(new Callback<PsiResponse>() {
+            @Override
+            public void onResponse(Call<PsiResponse> call, Response<PsiResponse> response) {
+                //int statusCode = response.code();
+                data = response.body();
+
+                // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+                SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.map);
+                mapFragment.getMapAsync(MainActivity.this);
+            }
+
+            @Override
+            public void onFailure(Call<PsiResponse> call, Throwable t) {
+                // Log error here since request failed
+                Toast.makeText(MainActivity.this, "Api call failed!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -65,8 +91,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //Disable Map Toolbar
+        mMap.getUiSettings().setMapToolbarEnabled(false);
 
-        LatLng singapore = new LatLng(1.35735,103.82);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(singapore, 10));
+        if(data != null) {
+            mMap.setInfoWindowAdapter(new InfoWindowCustomAdapter(this, data));
+
+            LatLng singapore = new LatLng(1.35735,103.82);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(singapore, 10));
+
+            List<RegionMetadata> list = data.getRegionMetadata();
+
+            for(int i = 0; i < list.size(); i++) {
+                RegionMetadata metadata = list.get(i);
+                LatLng loc = new LatLng(metadata.getLabelLocation().getLatitude(), metadata.getLabelLocation().getLongitude());
+                String metadataName = metadata.getName();
+                mMap.addMarker(new MarkerOptions()
+                        .position(loc)
+                        .title(metadataName.substring(0, 1).toUpperCase() + metadataName.substring(1)));
+            }
+        }
     }
 }
